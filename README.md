@@ -8,8 +8,6 @@ Inspired from [Dave Atchley - Gist](https://gist.github.com/datchley/4e0d05c526d
   * [React Guidelines](#react-guidelines)
       * [Organization](#organization)
       * [Components](#components)
-      * [Container Components](#container-components)
-      * [Presentational Components](#presentational-components)
       * [JSX](#jsx)
       * [Component Styles](#component-styles)
       * [Naming Things](#naming-things)
@@ -24,20 +22,14 @@ Inspired from [Dave Atchley - Gist](https://gist.github.com/datchley/4e0d05c526d
 
 
 
-This is a working set of guidelines for developing React applications.  We say "*guideline*" because there are no hard-and-fast rules; best practices, patterns and technology change over time, so we consider this a living set of style guides.
+This is a working set of guidelines for developing React applications.
 
 # What is this for?
 
-- Any UI developers working on React or React Native.
-- Feedbacks are always encouraged.
+- SETWorks Devs
 
-The guide is meant to provide direction on building quality code across the UI projects and development teams;  
+The guide is meant to provide direction on building quality code across the UI and the development team.  
 
-While, at the same time, providing enough flexibility that individual developers and teams feel they can innovate, create and discover better or more useful ways to deliver quality code.  
-
-You can engage by posting an issue.
-
-The channel is a great place to find out about current React practices and direction, ask questions and even hang out chat and help other developers that might need assistance.  If you or your team has a new idea or interesting approach, this is a great forum to discuss it and get some feedback.
 
 ## React Guidelines
 React makes it easy to build modular, declarative, components. 
@@ -58,72 +50,9 @@ React makes it easy to build modular, declarative, components.
 - [Feature First Organization](https://medium.com/front-end-hacking/the-secret-to-organization-in-functional-programming-913484e85fc9#.hntdncupt) - by *Ryan C. Collins*
 
 
-<a name="react-organization--component_types"></a><a name="1.1"></a>
-§ [1.1](#react-organization--component_types) **Component Types**: Separate components into Container (*smart*) and Presentational (*dumb*) component types.
-
-
-| &nbsp; | Container Components | Presentational Components |
-| ---: | --- | --- |
-| **Location** | top level, route handlers | middle + leaf components |
-| **Aware of Redux** | Yes | No |
-| **Reading Data** | subscribe to Redux State | From props |
-| **Changing Data** | dispatch Redux actions | invoke callbacks from props |
-
-> "Don’t take the presentational and container component separation as a dogma. Sometimes it doesn’t matter or it’s hard to draw the line. If you feel unsure about whether a specific component should be presentational or a container, it might be too early to decide. Don’t sweat it!" 
-> -- *Dan Abramov*
-
-
-<a name="react-organization--container_components"></a><a name="1.2"></a> 
-§ [1.2](#react-organization--container_components) **Container Components**: Try to organize container components around the following principles:
-
-- Are concerned with how things work.
-- May contain both presentational and container components inside but usually don’t have any DOM markup of their own except for some wrapping divs, and never have any styles.
-- Provide the data and behavior to presentational or other container components.
-- Call Redux actions and provide these as callbacks to the presentational components.
-
-<a name="react-organization--presentational_components"></a><a name="1.3"></a> 
-§ [1.3](#react-organization--presentational_components) **Presentational Components**: Try to organize presentational components around the following principles:
-
-- Are concerned with how things look.
-- May contain both presentational and container components inside, and usually have some DOM markup and styles of their own.
-- Often allow containment/composition via `this.props.children`.
-- Have no dependencies on the rest of the app, such as Redux actions or state.
-- Don’t specify how the data is loaded or mutated.
-- Receive data and callbacks exclusively via props.
-- Rarely have their own state (*when they do, it’s UI state rather than data*).
-- Should be written as functional components unless they need state, lifecycle hooks, or performance optimizations.
-
 
 <a name="react-organization--component_folders"></a><a name="1.3"></a> 
-§ [1.3](#react-organization--component_folders) **Component Folder Organization**: Take advantage of *feature-first* organization and separate presentational and container components into separate, top-level folders in your source tree; with each component getting its own folder. 
-
-- Have two top level folders: `src/containers` and `src/components` (*optionally, `src/pages` for calling out a distinction for container components used as router entry points*)
-- Using *feature-first* organization we build modular, reusable components by co-locating all the files related to that component in a single folder:
-
-```text
-src/
-  containers/
-    PendingRequestList/
-      index.js
-	  PendingRequestList.jsx
-	  test.spec.js
-    ...
-    
-  components/
-    RequestSummaryItem/
-	  index.js
-	  RequestSummaryItem.jsx
-	  styles.scss
-	  test.spec.js
-	...
-```
-- Each component folder contains all the behavior, styles, tests and/or other assets related to that component. The `index.js` is simply a rollup file to allow easier autoloading of the component module, while keeping the component in a self-named file to ease fuzzy finding in various editors/IDEs.
-- These component folders could even potentially contain sub-component folders organized the same way if those sub-components are directly related to or composed by the main component.
-
-> Why? React encourages a functional, declarative style that lends to better reuse. Taking a feature-first approach, and isolating all the files related to a given component in a single folder helps ensure better reusability of that component. With no outside dependencies, the component can be dragged/dropped as a folder into any other project; or even pulled out into it's own npm module/package.
-> 
-> You also get the added benefit of easing the cognitive load on developers, keeping them from having to search around the file system looking for the styles, tests or other assets related to the component they're working on.
-
+§ [1.3](#react-organization--component_folders) **Component Folder Organization**: We a
 
 
 **[⬆ back to top](#table-of-contents)**
@@ -267,272 +196,10 @@ function Bookend({ left, right = '', children = null }) { ... }
 
 **[⬆ back to top](#table-of-contents)**
 
-### Container Components
-Useful Resources:
-- [Presentational &amp; Container Components](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0) - by *Dan Abramov*
-- [Container Components](https://css-tricks.com/learning-react-container-components/) by *Brad Westfall*
-- [Understanding the React Component Lifecycle](http://busypeoples.github.io/post/react-component-lifecycle/) - by *A. Sharif*
-
-<a name="react-container-components--understand_behavior_state"></a><a name="3.1"></a> 
-§ [3.1](#react-container-components--understand_behavior_state) **Containers understand behavior and state**: As it relates to the application, container components understand the behavior and state needed to operate. Regardless of where that state comes from, the container's responsibility is to manage that state and provide the appropriate application level behaviors, via functions; and pass those down to presentational components via props.
-
-```jsx
-// container component
-class NumberListContainer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { numbers: [1,2,3,4,5] };
-  }
-  render() {
-    return <NumberList {...this.state}/>;
-  }
-}
-
-// presentational components
-const NumberList = ({ numbers }) => (
-  <ul>{ numbers.map(n => <Number value={n}/>) }</ul>
-);
-
-const Number = ({ value }) => <li>{value}</li>;
-```
-
-<a name="react-container-components--connect_containers"></a><a name="3.2"></a> 
-§ [3.2](#react-container-components--connect_containers) **Connect Containers to state using `connect()`**: Containers, likely, will need access to the global Redux state. Use `react-redux`'s `connect()` higher order component to connect to the Redux store and receive state as props when Redux state changes.
-
-```es6
-// src/containers/MyContainer/my-container.jsx
-import { connect } from 'react-redux';
-
-export class MyContainer extends Component { ... }
-
-const mapStateToProps = (state) => ({
-  // map state to component props...
-});
-const mapDispatchToProps = (dispatch) => ({
-  // map dispatch to action creators to props...
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(MyContainer);
-```
-
-   - `mapStateToProps()` is used to assign slices of your redux state to properties that should be passed to your component *every time state changes*
-   - `mapDispatchToProps()` allows you to pass action creators as props to your component and bind them in a call to the redux store's `dispatch()` method.
-
-<a name="react-container-components--no_layout"></a><a name="3.3"></a> 
-§ [3.3](#react-container-components--no_layout) **Containers should not perform layout**: Containers components should perform data fetching, pull necessary data from state or compute dynamic state, provide behavior as callback methods and then pass those items as props to presentational components for rendering.
-
-```es6
-// bad
-@connect(
-  (state) => ({ comments: state.comments }),
-  { fetchComments }
-)
-class CommentList extends React.Component {
-  componentDidMount() {
-    this.props.fetchComments();
-  }
-  render() {
-    return (
-      <ul>
-      { this.props.comments.map(renderComment) }
-      </ul>
-    );
-  }
-  renderComment({body, author}) {
-    return <li>{body}—{author}</li>;
-  }
-}
-```
-```es6
-// good
-@connect(
-  (state) => ({ comments: state.comments }),
-  { fetchComments }
-)
-class CommentListContainer extends React.Component {
-  componentDidMount() {
-    this.props.fetchComments();
-  }
-  render() {
-    return <CommentList comments={this.props.comments} />;
-  }
-}
-
-// Presentational Components
-const Comment = ({ body, author }) => (
-  <li>{body}—{author}</li>
-);
-
-const CommentList = ({ comments }) => (
-    <ul>
-     {comments.map(comment => <Comment {...comment}/>)}
-    </ul>
-);
-```
-
-> Why? This separates concerns, allow our Container to focus on just gather data while layout concerns are handled by presentational components.
-
-<a name="react-container-components--export_connected_and_not"></a><a name="3.4"></a> 
-§ [3.4](#react-container-components--export_connected_and_not) **Export both the connected and non-connected component**: Container components should export the undecorated component (*for unit testing*) as a named export and the connected component as the default export (*for use within the app*).
-
-```javascript
-// export named component
-export class MyContainer extends Component { ... }
-
-// export connected component as default
-export default connect(...)(MyContainer);
-```
-
-> Why? When writing unit tests, we don't need to test the functionality of `react-redux`'s `<Provider/>` or the `connect()` function itself.  You can safely assume those have been tested and do their job. What you want to test is the actual container component itself.  By exporting the un-connected container, you can easily mock plain objects as props to test the container across different scenarios.
-> 
-> This also makes the unit tests simpler to design and setup, as you reduce the amount of boilerplate you need for the test to work.
-
-<a name="react-container-components--fetch_in_constructor_or_did_mount"></a><a name="3.5"></a> 
-§ [3.5](#react-container-components--fetch_in_constructor_or_did_mount) **Fetch data within the correct lifecycle method**: If you're not doing server-side rendering (*SSR*) then `componentDidMount()` or the `constructor()` is the best place to handle async requests for resources.
-
-> Why? The component's `constructor()` and `componentWillMount()` are called on both server-side and client-side; while `componentDidMount()` is called only on client-side. 
-
-- Here's some relevant clarification from the React documentation (see [lifecycle methods](https://facebook.github.io/react/docs/react-component.html#the-component-lifecycle) for more details)
-
-> **`constructor(props)`** The constructor for a React component is called before it is mounted.
-> The constructor is the right place to initialize state. If you don't initialize state and you don't bind methods, you don't need to implement a constructor for your React component.
-> 
-> **`componentWillMount()`** is invoked immediately before mounting occurs. It is called before `render()`, therefore setting state in this method will not trigger a re-rendering. Avoid introducing any side-effects or subscriptions in this method.
->
-> This is the only lifecycle hook called on server rendering. Generally, we recommend using the `constructor()` instead.
-
-> **`componentDidMount()`** is invoked immediately after a component is mounted. Initialization that requires DOM nodes should go here. If you need to load data from a remote endpoint, this is a good place to instantiate the network request. Setting state in this method will trigger a re-rendering.
-
-
-**[⬆ back to top](#table-of-contents)**
-
-### Presentational Components
-Useful Resources:
-- [Make your React Components Pretty](https://medium.com/walmartlabs/make-your-react-components-pretty-a1ae4ec0f56e#.dfe7joyjx) - by *Mark Brouch*
-- [Get your App outta my Component](https://medium.com/@adamterlson/functional-react-series-part-1-get-your-app-outta-my-component-92656ae13e25#.epk8a64ap) - by *Adam Terlson*
-
-
-<a name="react-presentational-components--should_be_stateless"></a><a name="4.1"></a> 
-§ [4.1](#react-presentational-components--should_be_stateless) **Presentational Components should be stateless functional components**: Presentational components (*should*) rely on props only and don't manage or access state. Writing them as stateless functional components keeps them simple and allows various perf improvements within React's rendering of the virtual-dom.
-
-- rely on props only (*leave state management to containers*)
-- are pure (*deterministic*) functions, their output is solely determined by their input (*props*). And, they don't cause external side-effects.
-
-```jsx
-// bad
-class Author extends Component {
-  render() { 
-    const { author, email } = this.props;
-    return <p><b>{author}</b> - {email}</p>;
-  }
-}
-```
-```jsx
-// good
-const Author = ({ author, email }) => (
-  <p><b>{author}</b> - {email}</p>
-);
-```
-
-<a name="react-presentational-components--local_is_minimal"></a><a name="4.2"></a> 
-§ [4.2](#react-presentational-components--local_is_minimal) **(*if used*) Local state should be UI specific or transient; and minimal**: Local state is not "bad", per se; and there are instances where it can be useful. If the state in consideration is useful to other components in the application or should be modified by other components, move it from local state to the Redux store.
-
-> "There is so much FUD about local state. *“setState is bad”*, *“no-set-state”*, *“root of all evil”*, *“use functional components”*. State is fine.
-> 
-> When people say `setState()` is an anti-pattern, they mean 500-line components with a complex `setState()` soup scattered across event handlers.
-> 
-> There is no “anti-pattern” in having a `<DropDown>` keep `isOpen` in local state. If it was an anti-pattern, React wouldn’t have this feature."
-> 
-> -- *Dan Abramov* via [twitter](https://twitter.com/dan_abramov/status/725089243836588032)
-
-<a name="react-presentational-components--expose_local_via_props"></a><a name="4.2.1"></a> 
-§ [4.2.1](#react-presentational-components--expose_local_via_props) **Expose any local state via props**: When your component does have any local state, you should expose it via props to allow sharing and persistence of that state at the application level, if needed.
-
-```jsx
-// bad
-class FlipCard extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { flipped: false };
-  }
-
-  toggleFlip() {
-    this.setState({ flipped: !this.state.flipped });
-  }
-
-  render() {
-    const { flipped } = this.state;
-    return (
-      <div className={flipped ? 'showBack' : 'showFront' }/>
-        <span className="flip-control" onClick={() => this.toggleFlip()} />
-        {/* ... */}
-      </div>
-    );
-}
-```
-
-> Why? The initial state of the component, flipped or not, can't be controlled by the application in the above code.  You'll always get a card that's initially showing the front; and the application has no way of knowing if/when the card gets flipped. Although the component is reusable, it is less useful to applications that wish to incorporate it.
-
-```jsx
-// good
-class FlipCard extends Component {
-  static propTypes = {
-    // expose internal state via props
-    flipped: PropTypes.bool,
-    onFlip: PropTypes.func
-    // ...
-  };
-  
-  constructor(props) {
-    super(props);
-    this.state = { 
-      flipped: props.flipped || false
-    };
-  }
-  
-  toggleFlip() {
-    const { onFlip } = this.props;
-    this.setState({ 
-      flipped: !this.state.flipped 
-    }, () => onFlip && onFlip(this.state.flipped));
-  }
-  
-  render() {
-    const { flipped } = this.state; 
-    return (
-      <div className={flipped ? 'showBack' : 'showFront' }/>
-        <span className="flip-control" onClick={() => this.toggleFlip()} />
-        {/* ... */}
-      </div>
-    );
-  }
-}
-```
-
-> Why? With very little effort, we can keep our component reusable, and allow applications that manage state at the global level with Redux, Flux, etc. to persist that state and have more control over the behavior of the component (*if desired*).
-
-
-<a name="react-presentational-components--minimize_dependencies"></a><a name="4.2.2"></a> 
-§ [4.2.2](#react-presentational-components--minimize_dependencies) **Reusable components should minimize assumptions and dependencies**: Components that may be used across projects, or put in a shared `npm` package, should make no assumptions about the application architecture; and minimize any dependencies.
-
-> Why? When writing components we should always be thinking about applicability and reusability. If we keep components agnostic about the application environment they are running in, we gain a more solid, flexible component or library that will be useful for projects over a longer period.
->
-> Assumptions like:
-> - our applications will always use Redux, or redux-thunk, ...
-> - we'll always have bootstrap's css globally available, so I'll use those class names...
-> - jQuery or `fetch` will always be there for AJAX calls...
->
-> will end up coupling the component or library to a very specific application stack.  Application stacks change, new projects might choose to go a different direction; and for whatever reason, those components now no longer work and must be abandoned or re-written.  
->  
-> Don't make assumptions when writing reusable components; and keep dependencies to a minimum; and when there is a dependency, make it explicit.
-
-
-**[⬆ back to top](#table-of-contents)**
-
 ### JSX
 
 <a name="react-jsx--keep_simple"></a><a name="5.1"></a> 
-§ [5.1](#react-jsx--keep_simple) **Keep conditional rendering clean and simple**: Handle conditional rendering in your component by using one of the following techniques to help keep code clean, readable and easy to extend:
+§ [5.1](#react-jsx--keep_simple) **Keep conditional rendering above the return statement**: Handle conditional rendering in your component by using one of the following techniques to help keep code clean, readable and easy to extend:
 
 - Using `if..else` outside of JSX, or a ternary `?:` inline w/ the JSX
 
@@ -624,81 +291,7 @@ const Rows = ({ records }) => (
 **[⬆ back to top](#table-of-contents)**
 
 ### Component Styles
-Useful Resources:
-- [Modular CSS with React](https://medium.com/@pioul/modular-css-with-react-61638ae9ea3e#.8zg4isxps) - by *Philippe Masset*
-- [CSS Modules: Welcome to the Future](https://glenmaddern.com/articles/css-modules) - by *Glen Maddern*
-- [What are CSS Modules and Why do we need them](https://css-tricks.com/css-modules-part-1-need/) - by *Robin Rendle*
-- [npm: classnames](https://www.npmjs.com/package/classnames) - author *Jed Watson*
-
-<a name="react-styles--use_css_modules"></a><a name="6.1"></a> 
-§ [6.1](#react-styles--use_css_modules) **Use [CSS Modules](https://github.com/css-modules/css-modules) for component styles**: each React component gets its own CSS file, which is scoped to that file and component. The magic happens at build time, when local class names – which can be super simple without risking collisions – are mapped to automatically-generated ones and exported as a JS object literal to use within React
-
-```scss
-// thumbnail/styles.scss 
-.image {
-  border-radius: 3px;
-}
-```
-```jsx
-// thumbnail/thumbnail.jsx 
-import styles from './styles.scss';
-export const Thumbnail = () => (
-  <img className={styles.image}/>
-);
-```
-
-```
-/* Rendered DOM */
-<img class="Thumbnail__image___1DA66"/>
-
-/* Processed thumbnail/styles.scss */
-.Thumbnail__image___1DA66 {
-  border-radius: 3px;
-}
-```
-
-<a name="react-styles--colocate_with_component"></a><a name="6.2"></a> 
-§ [6.2](#react-styles--colocate_with_component) **Following feature-first, co-locate styles with their component**: Using feature-first principles, we keep to our modular organization by co-locating the component's style in the same folder as the component code.  Depending on your webpack setup, you can use plain `css`, or `scss` (SaSS) or `less` (Less) for writing styles using CSS modules.
-
-```text
-MyComponent/
-  index.js
-  MyComponent.jsx
-  styles.scss
-```
-
-<a name="react-styles--use_classnames"></a><a name="6.3"></a> 
-§ [6.3](#react-styles--use_classnames) **Use [`classnames`](https://www.npmjs.com/package/classnames) for handling component classes**: The `classnames` module is a useful utility for building up dynamic, conditional class names for use within React's `className` prop, which takes a string.
-
-```jsx
-// bad
-class Button extends Component {
-  // ... 
-  render () {
-    var btnClass = 'btn';
-    if (this.state.isPressed) btnClass += ' btn-pressed';
-    else if (this.state.isHovered) btnClass += ' btn-over';
-    return <button className={btnClass}>{this.props.label}</button>;
-  }
-}
-```
-
-```jsx
-// good
-import classNames from 'classnames';
- 
-class Button extends Component {
-  // ... 
-  render () {
-    var btnClass = classNames('btn', {
-      'btn-pressed': this.state.isPressed,
-      'btn-over': !this.state.isPressed && this.state.isHovered
-    });
-    return <button className={btnClass}>{this.props.label}</button>;
-  }
-}
-```
-> Why? Using a utility likes `classnames` can help pull out CSS class name logic into one place, simplify building the full class string and makes it easier to both read and extend if styling changes
+- TODO
 
 **[⬆ back to top](#table-of-contents)**
 
@@ -758,7 +351,6 @@ render() {
 
 
 ## Redux
-Currently, Velmat Inventory uses Redux for application state management.
 
 Useful Resources:
 - [Redux Docs](http://redux.js.org/index.html)
